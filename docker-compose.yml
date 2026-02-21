@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ged_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ged_db
+      POSTGRES_USER: administrator
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  db-test:
+    image: postgres:15-alpine
+    container_name: ged_postgres_test
+    restart: always
+    environment:
+      POSTGRES_DB: ged_db_test
+      POSTGRES_USER: administratorTest
+      POSTGRES_PASSWORD: admin123Test
+    ports:
+      - "5433:5432"
+
+volumes:
+  postgres_data:
