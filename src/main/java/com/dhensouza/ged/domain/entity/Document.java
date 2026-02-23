@@ -43,7 +43,10 @@ public class Document {
     protected Document() {
     }
 
-    public Document(String title, String description, Account owner, String tenantId) {
+    public Document(String title, String description, Account owner, String tenantId, List<String> tags) {
+        this.tags = new ArrayList<>();
+        if(tags != null) this.addTags(tags);
+
         this.id = UUID.randomUUID();
         this.setTitle(title);
         this.description = description;
@@ -123,6 +126,12 @@ public class Document {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void addTags(List<String> tags) {
+        if (tags != null && !tags.isEmpty()) {
+            this.tags.addAll(tags);
+        }
     }
 
     @PreUpdate
