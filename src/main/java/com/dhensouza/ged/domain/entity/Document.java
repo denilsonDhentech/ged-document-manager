@@ -21,6 +21,8 @@ public class Document {
 
     private String description;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "document_tags", joinColumns = @JoinColumn(name = "document_id"))
     @Column(name = "tags")
     private List<String> tags;
 

@@ -1,12 +1,10 @@
 package com.dhensouza.ged.domain.repository;
 
 import com.dhensouza.ged.domain.entity.Document;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.UUID;
-public interface DocumentRepository {
-    Document save(Document document);
-    Optional<Document> findById(UUID id);
-    List<Document> findAllByTenantId(String tenantId);
+
+public interface DocumentRepository extends JpaRepository<Document, UUID>, JpaSpecificationExecutor<Document> {
     void deleteById(UUID id);
 }
