@@ -64,4 +64,9 @@ public class AuditLog {
     public String getMetadata() {
         return metadata;
     }
+
+    public static AuditLog logFileUpload(Account account, UUID documentId, int version) {
+        String metadata = String.format("{\"version\": %d}", version);
+        return new AuditLog(account, AuditAction.FILE_UPLOADED, documentId, metadata);
+    }
 }

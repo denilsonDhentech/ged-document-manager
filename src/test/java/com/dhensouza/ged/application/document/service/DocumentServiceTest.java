@@ -1,9 +1,11 @@
 package com.dhensouza.ged.application.document.service;
 
 import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
+import com.dhensouza.ged.application.document.dto.request.FileUploadRequest;
 import com.dhensouza.ged.application.document.dto.request.UpdateDocumentMetadataRequest;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.entity.Document;
+import com.dhensouza.ged.domain.enums.AuditAction;
 import com.dhensouza.ged.domain.enums.DocumentStatus;
 import com.dhensouza.ged.domain.exception.BusinessRuleException;
 import com.dhensouza.ged.domain.exception.EntityNotFoundException;
@@ -134,5 +136,50 @@ class DocumentServiceTest {
         assertThrows(BusinessRuleException.class, () ->
                 documentService.changeStatus(docId, DocumentStatus.PUBLISHED)
         );
+    }
+
+    @Test
+    @DisplayName("Should create a new version with incremental number when document already has versions")
+    void shouldCreateNewIncrementalVersionSuccessfully() {
+        Account uploader = mock(Account.class);
+        Document existingDoc = new Document("Title", "Desc", uploader, "t1", null);
+
+        UUID realDocId = existingDoc.getId();
+        UUID uploaderId = UUID.randomUUID();
+
+        FileUploadRequest uploadRequest = new FileUploadRequest(
+                realDocId, uploaderId, "storage-key-v2", "hash-v2", 200L, "pdf"
+        );
+
+        when(documentRepository.findById(realDocId)).thenReturn(Optional.of(existingDoc));
+        when(accountRepository.findById(uploaderId)).thenReturn(Optional.of(uploader));
+        when(versionRepository.findMaxVersionByDocumentId(realDocId)).thenReturn(Optional.of(1));
+
+        documentService.uploadNewVersion(uploadRequest);
+
+        verify(versionRepository).save(argThat(version -> version.getVersionNumber() == 2));
+        verify(auditLogRepository).save(argThat(log ->
+                log.getAction() == AuditAction.FILE_UPLOADED &&
+                        log.getDocumentId().equals(realDocId)
+        ));
+    }
+
+    @Test
+    @DisplayName("Should throw BusinessRuleException when uploading to an archived document")
+    void shouldThrowExceptionWhenUploadingToArchivedDocument() {
+        Account uploader = mock(Account.class);
+        Document archivedDoc = new Document("Title", "Desc", uploader, "t1", null);
+        archivedDoc.changeStatus(DocumentStatus.PUBLISHED);
+        archivedDoc.changeStatus(DocumentStatus.ARCHIVED);
+
+        UUID realDocId = archivedDoc.getId();
+        FileUploadRequest request = new FileUploadRequest(realDocId, UUID.randomUUID(), "k", "h", 1L, "p");
+
+        when(documentRepository.findById(realDocId)).thenReturn(Optional.of(archivedDoc));
+        when(accountRepository.findById(any())).thenReturn(Optional.of(uploader));
+
+        assertThrows(BusinessRuleException.class, () -> documentService.uploadNewVersion(request));
+
+        verify(versionRepository, never()).save(any());
     }
 }

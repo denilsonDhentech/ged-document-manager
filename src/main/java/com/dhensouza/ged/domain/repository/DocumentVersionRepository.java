@@ -7,6 +7,5 @@ import java.util.UUID;
 
 public interface DocumentVersionRepository {
     DocumentVersion save(DocumentVersion version);
-    List<DocumentVersion> findAllByDocumentId(UUID documentId);
-    Optional<DocumentVersion> findLatestByDocumentId(UUID documentId);
+    Optional<Integer> findMaxVersionByDocumentId(UUID documentId);
 }
