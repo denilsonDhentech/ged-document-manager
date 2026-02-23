@@ -1,16 +1,16 @@
 package com.dhensouza.ged;
 
-import com.dhensouza.ged.infrastructure.configuration.TestBeanConfiguration;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@Import(TestBeanConfiguration.class)
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class GedDocumentManagerApplicationTests {
 
 	@Test
 	void contextLoads() {
 	}
-
 }

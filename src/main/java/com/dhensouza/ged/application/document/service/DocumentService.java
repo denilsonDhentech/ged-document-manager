@@ -69,7 +69,6 @@ public class DocumentService {
         );
     }
 
-// No DocumentService.java
 
     public void updateMetadata(UUID docId, UpdateDocumentMetadataRequest request) {
         Document document = documentRepository.findById(docId)

@@ -1,11 +1,11 @@
 package com.dhensouza.ged.domain.repository;
 
 import com.dhensouza.ged.domain.entity.Account;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AccountRepository {
-    Account save(Account account);
-    Optional<Account> findById(UUID id);
+public interface AccountRepository extends JpaRepository<Account, UUID> {
     Optional<Account> findByUsername(String username);
 }
