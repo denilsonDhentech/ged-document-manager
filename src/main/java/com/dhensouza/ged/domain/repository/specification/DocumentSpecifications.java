@@ -9,27 +9,25 @@ import java.util.List;
 
 public class DocumentSpecifications {
 
-    public static Specification<Document> withFilters(String title, DocumentStatus status, String tag, String tenantId) {
+    public static Specification<Document> hasTenant(String tenantId) {
+        return (root, query, cb) -> cb.equal(root.get("tenantId"), tenantId);
+    }
+
+    public static Specification<Document> titleLike(String title) {
+        return (root, query, cb) -> (title == null || title.isBlank()) ? null :
+                cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
+    }
+
+    public static Specification<Document> hasStatus(DocumentStatus status) {
+        return (root, query, cb) -> (status == null) ? null :
+                cb.equal(root.get("status"), status);
+    }
+
+    public static Specification<Document> hasTag(String tag) {
         return (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            predicates.add(cb.equal(root.get("tenantId"), tenantId));
-
-            if (title != null && !title.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%"));
-            }
-
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
-            }
-
-            if (tag != null && !tag.isBlank()) {
-                predicates.add(cb.equal(root.join("tags"), tag));
-            }
-
+            if (tag == null || tag.isBlank()) return null;
             query.distinct(true);
-
-            return cb.and(predicates.toArray(new Predicate[0]));
+            return cb.equal(root.join("tags"), tag);
         };
     }
 }

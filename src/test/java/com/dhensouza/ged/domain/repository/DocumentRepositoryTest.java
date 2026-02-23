@@ -16,6 +16,7 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 
 
@@ -58,10 +59,12 @@ class DocumentRepositoryTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Document> result = documentRepository.findAll(
-                DocumentSpecifications.withFilters("Manual", DocumentStatus.PUBLISHED, null, defaultTenant),
-                pageable
-        );
+        Specification<Document> spec = Specification
+                .where(DocumentSpecifications.hasTenant(defaultTenant))
+                .and(DocumentSpecifications.titleLike("Manual"))
+                .and(DocumentSpecifications.hasStatus(DocumentStatus.PUBLISHED));
+
+        Page<Document> result = documentRepository.findAll(spec, pageable);
 
         assertEquals(1, result.getTotalElements());
         assertEquals("Manual PDF", result.getContent().get(0).getTitle());
@@ -77,10 +80,13 @@ class DocumentRepositoryTest {
         entityManager.persist(docCsharp);
         entityManager.flush();
 
-        Page<Document> result = documentRepository.findAll(
-                DocumentSpecifications.withFilters(null, null, "Java", defaultTenant),
-                PageRequest.of(0, 10)
-        );
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Specification<Document> spec = Specification
+                .where(DocumentSpecifications.hasTenant(defaultTenant))
+                .and(DocumentSpecifications.hasTag("Java"));
+
+        Page<Document> result = documentRepository.findAll(spec, pageable);
 
         assertEquals(1, result.getTotalElements());
         assertTrue(result.getContent().get(0).getTags().contains("Java"));
