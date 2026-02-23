@@ -8,6 +8,7 @@ import com.dhensouza.ged.domain.entity.AuditLog;
 import com.dhensouza.ged.domain.entity.Document;
 import com.dhensouza.ged.domain.entity.DocumentVersion;
 import com.dhensouza.ged.domain.enums.AuditAction;
+import com.dhensouza.ged.domain.enums.DocumentStatus;
 import com.dhensouza.ged.domain.exception.EntityNotFoundException;
 import com.dhensouza.ged.domain.repository.AccountRepository;
 import com.dhensouza.ged.domain.repository.AuditLogRepository;
@@ -83,6 +84,23 @@ public class DocumentService {
                 document.getId(),
                 "{ \"info\": \"Metadata updated by Service\" }"
         );
+        auditLogRepository.save(log);
+    }
+
+    public void changeStatus(UUID docId, DocumentStatus newStatus) {
+        Document document = documentRepository.findById(docId)
+                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
+
+        document.changeStatus(newStatus);
+        documentRepository.save(document);
+
+        AuditLog log = new AuditLog(
+                document.getOwner(),
+                newStatus.getAuditAction(),
+                document.getId(),
+                "Status changed to " + newStatus
+        );
+
         auditLogRepository.save(log);
     }
 }

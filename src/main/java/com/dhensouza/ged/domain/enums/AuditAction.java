@@ -1,6 +1,8 @@
 package com.dhensouza.ged.domain.enums;
 
 public enum AuditAction {
+    DOCUMENT_PUBLISHED,
+    DOCUMENT_ARCHIVED,
     CREATE_DOCUMENT,
     UPDATE_DOCUMENT,
     DELETE_DOCUMENT,

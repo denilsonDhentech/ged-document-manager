@@ -4,6 +4,8 @@ import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
 import com.dhensouza.ged.application.document.dto.request.UpdateDocumentMetadataRequest;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.entity.Document;
+import com.dhensouza.ged.domain.enums.DocumentStatus;
+import com.dhensouza.ged.domain.exception.BusinessRuleException;
 import com.dhensouza.ged.domain.exception.EntityNotFoundException;
 import com.dhensouza.ged.domain.repository.*;
 import org.junit.jupiter.api.DisplayName;
@@ -100,6 +102,37 @@ class DocumentServiceTest {
 
         assertThrows(EntityNotFoundException.class, () ->
                 documentService.updateMetadata(docId, new UpdateDocumentMetadataRequest("T", "D", null))
+        );
+    }
+
+    @Test
+    @DisplayName("Should successfully publish a draft document and record audit log")
+    void shouldPublishDocumentSuccessfully() {
+        UUID docId = UUID.randomUUID();
+        Document existingDoc = new Document("Title", "Desc", mock(Account.class), "t1", null);
+        assertEquals(DocumentStatus.DRAFT, existingDoc.getStatus());
+
+        when(documentRepository.findById(docId)).thenReturn(Optional.of(existingDoc));
+
+        documentService.changeStatus(docId, DocumentStatus.PUBLISHED);
+
+        assertEquals(DocumentStatus.PUBLISHED, existingDoc.getStatus());
+        verify(documentRepository, times(1)).save(existingDoc);
+        verify(auditLogRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Should throw BusinessRuleException when trying to publish an archived document")
+    void shouldThrowExceptionWhenPublishingArchivedDocument() {
+        UUID docId = UUID.randomUUID();
+        Document archivedDoc = new Document("Title", "Desc", mock(Account.class), "t1", null);
+
+        archivedDoc.changeStatus(DocumentStatus.ARCHIVED);
+
+        when(documentRepository.findById(docId)).thenReturn(Optional.of(archivedDoc));
+
+        assertThrows(BusinessRuleException.class, () ->
+                documentService.changeStatus(docId, DocumentStatus.PUBLISHED)
         );
     }
 }
