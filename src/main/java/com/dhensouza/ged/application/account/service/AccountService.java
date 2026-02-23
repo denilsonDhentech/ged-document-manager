@@ -20,7 +20,7 @@ public class AccountService {
             throw new BusinessRuleException("The username '" + request.username() + "' is already in use.");
         });
 
-        Account account = new Account(
+        Account account = Account.create(
                 request.username(),
                 request.password(),
                 request.role(),
@@ -29,11 +29,6 @@ public class AccountService {
 
         Account savedAccount = accountRepository.save(account);
 
-        return new AccountResponse(
-                savedAccount.getId(),
-                savedAccount.getUsername(),
-                savedAccount.getRole(),
-                savedAccount.getTenantId()
-        );
+        return AccountResponse.fromEntity(savedAccount);
     }
 }
