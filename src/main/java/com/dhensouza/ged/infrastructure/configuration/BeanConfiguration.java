@@ -3,6 +3,7 @@ package com.dhensouza.ged.infrastructure.configuration;
 import com.dhensouza.ged.application.account.service.AccountService;
 import com.dhensouza.ged.application.document.service.DocumentService;
 import com.dhensouza.ged.domain.repository.AccountRepository;
+import com.dhensouza.ged.domain.repository.AuditLogRepository;
 import com.dhensouza.ged.domain.repository.DocumentRepository;
 import com.dhensouza.ged.domain.repository.DocumentVersionRepository;
 import jakarta.transaction.Transactional;
@@ -23,7 +24,8 @@ public class BeanConfiguration {
     public DocumentService documentService(
             DocumentRepository docRepo,
             DocumentVersionRepository verRepo,
-            AccountRepository accRepo) {
-        return new DocumentService(docRepo, verRepo, accRepo);
+            AccountRepository accRepo,
+            AuditLogRepository auditRepo) {
+        return new DocumentService(docRepo, verRepo, accRepo, auditRepo);
     }
 }
