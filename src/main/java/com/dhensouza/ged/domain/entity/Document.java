@@ -1,6 +1,7 @@
 package com.dhensouza.ged.domain.entity;
 
 import com.dhensouza.ged.domain.enums.DocumentStatus;
+import com.dhensouza.ged.domain.exception.BusinessRuleException;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -157,5 +158,19 @@ public class Document {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void changeStatus(DocumentStatus newStatus) {
+        if (this.status == newStatus) return;
+
+        if (!this.status.canTransitionTo(newStatus)) {
+            throw new BusinessRuleException(
+                    String.format("Invalid transition from %s to %s", this.status, newStatus)
+            );
+        }
+
+        this.status = newStatus;
+        this.updatedAt = LocalDateTime.now();
+
     }
 }
