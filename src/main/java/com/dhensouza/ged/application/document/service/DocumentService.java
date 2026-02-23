@@ -1,6 +1,7 @@
 package com.dhensouza.ged.application.document.service;
 
 import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
+import com.dhensouza.ged.application.document.dto.request.FileUploadRequest;
 import com.dhensouza.ged.application.document.dto.request.UpdateDocumentMetadataRequest;
 import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
 import com.dhensouza.ged.domain.entity.Account;
@@ -100,6 +101,28 @@ public class DocumentService {
                 document.getId(),
                 "Status changed to " + newStatus
         );
+
+        auditLogRepository.save(log);
+    }
+
+    public void uploadNewVersion(FileUploadRequest request) {
+        Document document = documentRepository.findById(request.documentId())
+                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
+
+        Account uploader = accountRepository.findById(request.uploaderId())
+                .orElseThrow(() -> new EntityNotFoundException("Uploader not found"));
+
+        int nextVersion = versionRepository.findMaxVersionByDocumentId(document.getId())
+                .map(currentMax -> currentMax + 1)
+                .orElse(1);
+
+        DocumentVersion newVersion = document.createNewVersion(
+                nextVersion, request.fileKey(), request.checksum(),
+                request.fileSize(), request.fileType(), uploader
+        );
+
+        versionRepository.save(newVersion);
+        AuditLog log = AuditLog.logFileUpload(uploader, document.getId(), nextVersion);
 
         auditLogRepository.save(log);
     }

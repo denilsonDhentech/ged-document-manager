@@ -173,4 +173,12 @@ public class Document {
         this.updatedAt = LocalDateTime.now();
 
     }
+
+    public DocumentVersion createNewVersion(int versionNumber, String fileKey, String checksum, Long fileSize, String fileType, Account uploader) {
+        if (this.status == DocumentStatus.ARCHIVED) {
+            throw new BusinessRuleException("Cannot add versions to an archived document.");
+        }
+
+        return new DocumentVersion(this, versionNumber, fileKey, checksum, fileSize, fileType, uploader);
+    }
 }
