@@ -68,4 +68,8 @@ public class Account {
     public void changeRole(String newRole) {
         this.role = newRole;
     }
+
+    public static Account create(String username, String password, String role, String tenantId) {
+        return new Account(username, password, role, tenantId);
+    }
 }
