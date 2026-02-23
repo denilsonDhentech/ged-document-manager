@@ -44,18 +44,20 @@ public class Document {
     }
 
     public Document(String title, String description, Account owner, String tenantId, List<String> tags) {
-        this.tags = new ArrayList<>();
-        if(tags != null) this.addTags(tags);
-
         this.id = UUID.randomUUID();
         this.setTitle(title);
         this.description = description;
         this.owner = owner;
         this.tenantId = tenantId;
         this.status = DocumentStatus.DRAFT;
-        this.tags = new ArrayList<>();
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+
+        this.tags = new ArrayList<>();
+
+        if (tags != null) {
+            this.addTags(tags);
+        }
     }
 
     public void publish() {
@@ -129,9 +131,15 @@ public class Document {
     }
 
     public void addTags(List<String> tags) {
-        if (tags != null && !tags.isEmpty()) {
-            this.tags.addAll(tags);
-        }
+        if (tags == null) return;
+
+        tags.stream()
+                .filter(tag -> tag != null && !tag.isBlank())
+                .forEach(tag -> {
+                    if (!this.tags.contains(tag)) {
+                        this.tags.add(tag.trim());
+                    }
+                });
     }
 
     @PreUpdate
