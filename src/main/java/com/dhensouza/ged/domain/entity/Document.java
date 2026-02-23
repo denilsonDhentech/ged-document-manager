@@ -142,6 +142,18 @@ public class Document {
                 });
     }
 
+    public void updateMetadata(String title, String description, List<String> tags) {
+        this.setTitle(title);
+        this.description = description;
+
+        if (tags != null) {
+            this.tags.clear();
+            this.addTags(tags);
+        }
+
+        this.updatedAt = LocalDateTime.now();
+    }
+
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
