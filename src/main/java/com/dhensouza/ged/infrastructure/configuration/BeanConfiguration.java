@@ -1,7 +1,11 @@
 package com.dhensouza.ged.infrastructure.configuration;
 
 import com.dhensouza.ged.application.account.service.AccountService;
+import com.dhensouza.ged.application.document.service.DocumentService;
 import com.dhensouza.ged.domain.repository.AccountRepository;
+import com.dhensouza.ged.domain.repository.DocumentRepository;
+import com.dhensouza.ged.domain.repository.DocumentVersionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,7 +13,17 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfiguration {
 
     @Bean
+    @Transactional
     public AccountService accountService(AccountRepository accountRepository) {
         return new AccountService(accountRepository);
+    }
+
+    @Bean
+    @Transactional
+    public DocumentService documentService(
+            DocumentRepository docRepo,
+            DocumentVersionRepository verRepo,
+            AccountRepository accRepo) {
+        return new DocumentService(docRepo, verRepo, accRepo);
     }
 }

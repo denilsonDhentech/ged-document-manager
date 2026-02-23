@@ -5,7 +5,6 @@ import com.dhensouza.ged.application.account.dto.response.AccountResponse;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.exception.BusinessRuleException;
 import com.dhensouza.ged.domain.repository.AccountRepository;
-import jakarta.transaction.Transactional;
 
 public class AccountService {
 
@@ -15,7 +14,7 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    @Transactional
+
     public AccountResponse create(CreateAccountRequest request) {
         accountRepository.findByUsername(request.username()).ifPresent(account -> {
             throw new BusinessRuleException("The username '" + request.username() + "' is already in use.");
