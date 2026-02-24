@@ -9,6 +9,7 @@ import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
 import com.dhensouza.ged.application.document.service.DocumentSearchService;
 import com.dhensouza.ged.application.document.service.DocumentService;
 import com.dhensouza.ged.domain.entity.Document;
+import com.dhensouza.ged.domain.enums.DocumentStatus;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,6 +86,17 @@ public class DocumentController {
 
         documentService.uploadNewVersion(serviceRequest);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public ResponseEntity<Void> changeStatus(
+            @PathVariable UUID id,
+            @RequestParam DocumentStatus newStatus,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        documentService.changeStatus(id, newStatus);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,6 +1,7 @@
 package com.dhensouza.ged.domain.entity;
 
 import com.dhensouza.ged.domain.enums.AuditAction;
+import com.dhensouza.ged.domain.enums.DocumentStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -72,5 +73,20 @@ public class AuditLog {
     public static AuditLog logFileUpload(Account account, UUID documentId, int version) {
         String metadata = String.format("{\"version\": %d}", version);
         return new AuditLog(account, AuditAction.FILE_UPLOADED, documentId, metadata);
+    }
+
+    // Dentro de AuditLog.java
+
+    public static AuditLog logStatusChange(Account account, UUID documentId, DocumentStatus oldStatus, DocumentStatus newStatus) {
+        String metadata = String.format(
+                "{\"previousStatus\": \"%s\", \"newStatus\": \"%s\", \"message\": \"Status changed to %s\"}",
+                oldStatus, newStatus, newStatus
+        );
+        return new AuditLog(account, newStatus.getAuditAction(), documentId, metadata);
+    }
+
+    public static AuditLog logMetadataUpdate(Account account, UUID documentId) {
+        String metadata = "{\"info\": \"Metadata updated by user\"}";
+        return new AuditLog(account, AuditAction.UPDATE_DOCUMENT, documentId, metadata);
     }
 }
