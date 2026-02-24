@@ -6,7 +6,10 @@ import com.dhensouza.ged.application.account.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -22,5 +25,11 @@ public class AccountController {
     public ResponseEntity<AccountResponse> register(@RequestBody @Valid CreateAccountRequest request) {
         AccountResponse response = accountService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<AccountResponse>> listAll() {
+        return ResponseEntity.ok(java.util.Collections.emptyList());
     }
 }
