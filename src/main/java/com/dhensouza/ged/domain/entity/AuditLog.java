@@ -2,6 +2,9 @@ package com.dhensouza.ged.domain.entity;
 
 import com.dhensouza.ged.domain.enums.AuditAction;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -26,7 +29,8 @@ public class AuditLog {
     @Column(name = "document_id")
     private UUID documentId;
 
-    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "metadata", columnDefinition = "jsonb")
     private String metadata;
 
     protected AuditLog() {

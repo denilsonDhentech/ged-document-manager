@@ -1,8 +1,10 @@
 package com.dhensouza.ged.api.controller.document;
 
 import com.dhensouza.ged.api.controller.document.dto.DocumentCreateWebDTO;
+import com.dhensouza.ged.application.document.dto.DocumentVersionWebDTO;
 import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
 import com.dhensouza.ged.application.document.dto.request.DocumentFilter;
+import com.dhensouza.ged.application.document.dto.request.FileUploadRequest;
 import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
 import com.dhensouza.ged.application.document.service.DocumentSearchService;
 import com.dhensouza.ged.application.document.service.DocumentService;
@@ -62,5 +64,27 @@ public class DocumentController {
         Page<DocumentResponse> response = result.map(DocumentResponse::fromEntity);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/versions")
+    public ResponseEntity<Void> uploadVersion(
+            @PathVariable UUID id,
+            @RequestBody @Valid DocumentVersionWebDTO webDto,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID uploaderId = UUID.fromString(jwt.getSubject());
+
+        FileUploadRequest serviceRequest = new FileUploadRequest(
+                id,
+                uploaderId,
+                webDto.fileKey(),
+                webDto.checksum(),
+                webDto.fileSize(),
+                webDto.fileType()
+        );
+
+        documentService.uploadNewVersion(serviceRequest);
+
+        return ResponseEntity.noContent().build();
     }
 }
