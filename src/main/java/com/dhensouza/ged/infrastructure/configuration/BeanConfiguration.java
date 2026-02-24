@@ -9,14 +9,15 @@ import com.dhensouza.ged.domain.repository.DocumentVersionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class BeanConfiguration {
 
     @Bean
     @Transactional
-    public AccountService accountService(AccountRepository accountRepository) {
-        return new AccountService(accountRepository);
+    public AccountService accountService(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+        return new AccountService(accountRepository, passwordEncoder);
     }
 
     @Bean
