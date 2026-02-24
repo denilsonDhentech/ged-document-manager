@@ -1,6 +1,6 @@
 # GED Document Manager Core
 
-Sistema de Gestão Eletrônica de Documentos (GED) desenvolvido como parte de um desafio técnico para **Desenvolvedor Java Backend Pleno**. A solução contempla o ciclo de vida de documentos, incluindo **versionamento, auditoria e controle de acesso**.
+Sistema de Gestão Eletrônica de Documentos (GED) desenvolvido como parte de um desafio técnico para **Desenvolvedor Java Backend Pleno**. A solução contempla o ciclo de vida completo de documentos, incluindo **storage em nuvem (S3), versionamento, auditoria e controle de acesso**.
 
 ## 📋 Sumário
 
@@ -8,20 +8,22 @@ Sistema de Gestão Eletrônica de Documentos (GED) desenvolvido como parte de um
 - [Tecnologias](#-tecnologias)
 - [Infraestrutura com Docker](#-infraestrutura-com-docker)
 - [Configuração e Execução](#️-configuração-e-execução)
+- [Estratégia de Testes](#-estratégia-de-testes)
 - [Decisões Técnicas](#-decisões-técnicas)
 
 ---
 
 ## 🚀 Sobre o Projeto
 
-O sistema permite a gestão de metadados e arquivos (**PDF/PNG/JPG**), garantindo a integridade através de **versionamento incremental** e **trilhas de auditoria detalhadas** para cada operação realizada.
+O sistema permite a gestão eficiente de metadados e arquivos (**PDF/PNG/JPG**), garantindo a integridade dos dados através de **versionamento incremental** e **trilhas de auditoria detalhadas** para cada operação.
 
 ### Funcionalidades Principais
 
-- **Autenticação e Autorização via JWT** (`ADMIN`, `USER`, `VIEWER`)
-- **CRUD completo de documentos** com filtros avançados e paginação
-- **Upload/Download de arquivos** com controle de versão e checksum **SHA-256**
-- **Auditoria completa** de eventos do sistema
+- **Autenticação e Autorização via JWT**: Diferenciação de permissões entre os perfis `ADMIN`, `USER` e `VIEWER`.
+- **Object Storage (S3/MinIO)**: Integração com armazenamento de objetos para escalabilidade de arquivos.
+- **Versionamento Automático**: Controle de revisões de arquivos anexados aos documentos.
+- **Checksum SHA-256**: Validação de integridade para garantir que o arquivo baixado é idêntico ao enviado originalmente.
+- **Auditoria de Eventos**: Log detalhado de alterações críticas e acessos armazenados de forma estruturada.
 
 ---
 
@@ -31,76 +33,66 @@ O sistema permite a gestão de metadados e arquivos (**PDF/PNG/JPG**), garantind
 - **Framework:** Spring Boot 4.0.3
 - **Persistência:** Spring Data JPA / Hibernate
 - **Banco de Dados:** PostgreSQL 15
+- **Object Storage:** AWS SDK v2 (S3 Client & Presigner)
 - **Migrações:** Flyway
 - **Segurança:** Spring Security + OAuth2 Resource Server (JWT)
-- **Containerização:** Docker & Docker Compose
+- **CI/CD:** GitHub Actions com integração Docker (Pipeline Automática)
 
 ---
 
 ## 🐳 Infraestrutura com Docker
 
-O projeto utiliza **Docker Compose** para orquestrar os ambientes de desenvolvimento e teste de forma isolada.
+O projeto utiliza **Docker Compose** para orquestrar os serviços necessários tanto para desenvolvimento quanto para a execução dos testes de integração.
 
 ### 1. Pré-requisitos
+- Docker & Docker Compose instalados e configurados.
 
-- Docker instalado e configurado
-- *(Opcional para Windows)* WSL2 configurado com integração Docker ativa
-
-### 2. Subindo os Bancos de Dados
-
-Na raiz do projeto, execute o comando abaixo para subir o banco de dados principal (**porta 5432**) e o banco de testes (**porta 5433**):
+### 2. Subindo os Serviços
+Na raiz do projeto, execute o comando abaixo para iniciar o **PostgreSQL** e o **MinIO**:
 
 ```bash
 docker compose up -d
 ```
 
-### 3. Caminhos de Execução no Docker
-
-Existem dois caminhos principais para gerenciar os containers:
-
-#### Via Terminal Nativo (Windows/Linux/Mac)
-
-Basta rodar o comando acima, desde que o executável do Docker esteja no seu `PATH`.
-
-#### Via WSL (Ubuntu)
-
-Se você gerencia o Docker dentro do subsistema Linux, acesse o diretório montado e execute:
-
-```bash
-cd /mnt/c/caminho/para/projeto
-docker compose up -d
-```
+### 3. Detalhes de Conectividade
+- **PostgreSQL (Dev):** Porta `5432` (Banco: `ged_db`).
+- **PostgreSQL (Testes):** Porta `5433` (Configurado automaticamente no perfil de teste).
+- **MinIO (Console):** `http://localhost:9001` (Credenciais: `minioadmin` / `minioadmin`).
+- **Bucket GED:** O container de inicialização `mc` cria automaticamente o bucket `ged-documents` ao subir o compose.
 
 ---
 
 ## ⚙️ Configuração e Execução
 
-### Migrações do Banco (Flyway)
-
-As migrações são executadas automaticamente na inicialização da aplicação.  
-Os scripts estão localizados em:
-
-`src/main/resources/db/migration`
-
 ### Executando a Aplicação
-
+Para rodar em ambiente de desenvolvimento (perfil default):
 ```bash
 ./mvnw spring-boot:run
 ```
+## 🧪 Estratégia de Testes
 
-### Executando Testes
+O projeto adota uma abordagem de **Testes de Integração Reais** para validar a camada de persistência e a lógica de negócio com mocks controlados de infraestrutura Cloud.
 
-Para rodar os testes unitários e de integração (requisito mínimo de **5 testes relevantes**):
-
+Para rodar a suíte completa de testes:
 ```bash
-./mvnw test
+./mvnw test -Ptest
 ```
+**Diferenciais técnicos aplicados nos testes:**
+
+* **Profile `test` Dedicado:** Uso de `application-test.properties` para total isolamento dos dados de desenvolvimento.
+* **MockitoBean:** Utilizado para simular o comportamento do `S3Client` e `S3Presigner`, garantindo que os testes não dependam de conexão externa ou credenciais reais de nuvem.
+* **Banco em Pipeline:** A pipeline CI no GitHub Actions provisiona automaticamente um Postgres via `services` na porta **5433** para execução dos testes.
 
 ---
 
 ## 🧠 Decisões Técnicas
 
-- **Java 21:** escolha estratégica pela estabilidade (LTS) e uso de recursos modernos como **Records** para DTOs.
-- **Flyway:** utilizado para garantir a reprodutibilidade do banco de dados e controle de versão de esquema.
-- **UUID:** identificadores universais para evitar exposição de IDs sequenciais e facilitar integrações futuras.
-- **Sem Lombok:** opção por código Java puro para demonstrar domínio da estrutura da linguagem e padrões de projeto manuais.
+* **Java 21:** Escolha estratégica pela estabilidade (LTS) e uso de **Records** para garantir imutabilidade nos DTOs e maior clareza no código.
+* **Abstração de Storage:** O uso do AWS SDK v2 permite que a aplicação seja facilmente portada de um MinIO local para uma instância real da AWS S3 com apenas alterações de configuração.
+* **Flyway:** Adotado para controle rigoroso de versionamento de esquema de banco de dados, facilitando migrações consistentes entre ambientes.
+* **UUID v4:** Todas as entidades utilizam UUIDs como chaves primárias, evitando a exposição de IDs sequenciais e aumentando a segurança contra ataques de enumeração.
+* **Sem Lombok:** Opção por código Java explícito para demonstrar domínio de POJOs, encapsulamento e estrutura fundamental da linguagem.
+
+---
+
+**Desenvolvido por DhenSouza**

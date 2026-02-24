@@ -12,6 +12,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  db-test:
+    image: postgres:15-alpine
+    container_name: ged_postgres_test
+    restart: always
+    environment:
+      POSTGRES_DB: ged_db_test
+      POSTGRES_USER: administratorTest
+      POSTGRES_PASSWORD: admin123Test
+    ports:
+      - "5433:5432"
+
   minio:
     image: minio/minio
     container_name: ged-storage
