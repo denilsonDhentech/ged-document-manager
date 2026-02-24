@@ -40,7 +40,6 @@ class DocumentSearchControllerTest extends BaseIntegrationTest {
         Account userB = Account.create("user_b", "hash", "USER", "TENANT_B");
         accountRepository.saveAll(List.of(userA, userB));
 
-        // Documentos para cada tenant
         Document docA = new Document("Financial Report", "Content A", userA, "TENANT_A", List.of("finance"));
         Document docB = new Document("HR Policies", "Content B", userB, "TENANT_B", List.of("hr"));
         documentRepository.saveAll(List.of(docA, docB));

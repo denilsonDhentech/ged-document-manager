@@ -73,12 +73,7 @@ public class DocumentService {
 
         documentRepository.save(document);
 
-        AuditLog log = new AuditLog(
-                document.getOwner(),
-                AuditAction.UPDATE_DOCUMENT,
-                document.getId(),
-                "{ \"info\": \"Metadata updated by Service\" }"
-        );
+        AuditLog log = AuditLog.logMetadataUpdate(document.getOwner(), document.getId());
         auditLogRepository.save(log);
     }
 
@@ -86,15 +81,11 @@ public class DocumentService {
         Document document = documentRepository.findById(docId)
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
 
+        DocumentStatus oldStatus = document.getStatus();
         document.changeStatus(newStatus);
         documentRepository.save(document);
 
-        AuditLog log = new AuditLog(
-                document.getOwner(),
-                newStatus.getAuditAction(),
-                document.getId(),
-                "Status changed to " + newStatus
-        );
+        AuditLog log = AuditLog.logStatusChange(document.getOwner(), document.getId(), oldStatus, newStatus);
 
         auditLogRepository.save(log);
     }
