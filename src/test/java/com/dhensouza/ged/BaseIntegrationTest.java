@@ -8,6 +8,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -24,4 +26,10 @@ public abstract class BaseIntegrationTest {
 
     @MockitoBean
     private S3StorageService storageService;
+
+    @MockitoBean
+    private S3Client s3Client;
+
+    @MockitoBean
+    private S3Presigner s3Presigner;
 }
