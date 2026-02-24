@@ -30,7 +30,7 @@ public abstract class BaseIntegrationTest {
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     @MockitoBean
-    private S3StorageService storageService;
+    protected S3StorageService storageService;
 
     @MockitoBean
     protected S3Client s3Client;
