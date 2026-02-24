@@ -5,30 +5,36 @@ import com.dhensouza.ged.application.account.dto.response.AccountResponse;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.exception.BusinessRuleException;
 import com.dhensouza.ged.domain.repository.AccountRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 public class AccountService {
 
-    private final AccountRepository accountRepository;
+    private final AccountRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AccountService(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
+    public AccountService(AccountRepository repository, PasswordEncoder passwordEncoder) {
+        this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-
+    @Transactional
     public AccountResponse create(CreateAccountRequest request) {
-        accountRepository.findByUsername(request.username()).ifPresent(account -> {
-            throw new BusinessRuleException("The username '" + request.username() + "' is already in use.");
-        });
+        if (repository.findByUsername(request.username()).isPresent()) {
+            throw new BusinessRuleException("Username already exists.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(request.password());
 
         Account account = Account.create(
                 request.username(),
-                request.password(),
+                encodedPassword,
                 request.role(),
                 request.tenantId()
         );
 
-        Account savedAccount = accountRepository.save(account);
-
+        Account savedAccount = repository.save(account);
         return AccountResponse.fromEntity(savedAccount);
     }
 }

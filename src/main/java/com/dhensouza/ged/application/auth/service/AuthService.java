@@ -6,9 +6,8 @@ import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.exception.BusinessRuleException;
 import com.dhensouza.ged.domain.repository.AccountRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-@Service
+
 public class AuthService {
 
     private final AccountRepository accountRepository;
