@@ -89,4 +89,14 @@ public class AuditLog {
         String metadata = "{\"info\": \"Metadata updated by user\"}";
         return new AuditLog(account, AuditAction.UPDATE_DOCUMENT, documentId, metadata);
     }
+
+    public static AuditLog logDocumentCreation(Account account, UUID documentId) {
+        String metadata = "{\"info\": \"Document created with initial version\"}";
+        return new AuditLog(account, AuditAction.DOCUMENT_CREATED, documentId, metadata);
+    }
+
+    public static AuditLog logFileDownload(Account account, UUID documentId, int version) {
+        String metadata = String.format("{\"version\": %d, \"info\": \"User requested download URL\"}", version);
+        return new AuditLog(account, AuditAction.FILE_DOWNLOADED, documentId, metadata);
+    }
 }

@@ -12,16 +12,31 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  db-test:
-    image: postgres:15-alpine
-    container_name: ged_postgres_test
-    restart: always
-    environment:
-      POSTGRES_DB: ged_db_test
-      POSTGRES_USER: administratorTest
-      POSTGRES_PASSWORD: admin123Test
+  minio:
+    image: minio/minio
+    container_name: ged-storage
     ports:
-      - "5433:5432"
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/ged-documents;
+      /usr/bin/mc anonymous set public myminio/ged-documents;
+      exit 0;
+      "
 
 volumes:
   postgres_data:
+  minio_data:
