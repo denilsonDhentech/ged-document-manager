@@ -49,21 +49,39 @@ O projeto utiliza **Docker Compose** para orquestrar os serviços necessários t
 
 ### 2. Subindo os Serviços
 Na raiz do projeto, execute o comando abaixo para iniciar o **PostgreSQL** e o **MinIO**:
-
 ```bash
 docker compose up -d
 ```
 
-### 3. Detalhes de Conectividade
-- **PostgreSQL (Dev):** Porta `5432` (Banco: `ged_db`).
-- **PostgreSQL (Testes):** Porta `5433` (Configurado automaticamente no perfil de teste).
-- **MinIO (Console):** `http://localhost:9001` (Credenciais: `minioadmin` / `minioadmin`).
-- **Bucket GED:** O container de inicialização `mc` cria automaticamente o bucket `ged-documents` ao subir o compose.
+### 3. Detalhes de Conectividade e Credenciais
+
+#### 🗄️ Banco de Dados (PostgreSQL)
+| Ambiente | Porta Host | Database | Usuário | Senha |
+| :--- | :--- | :--- | :--- | :--- |
+| **Desenvolvimento** | `5432` | `ged_db` | `administrator` | `admin123` |
+| **Testes** | `5433` | `ged_db_test` | `administratorTest` | `admin123Test` |
+
+#### 📦 Object Storage (MinIO/S3)
+| Serviço | URL/Porta                     | Usuário (Access Key) | Senha (Secret Key) |
+| :--- |:------------------------------| :--- | :--- |
+| **API/S3 Endpoint** | `http://localhost:9000`       | `minioadmin` | `minioadmin` |
+| **Console UI** | `http://localhost:9001/login` | `minioadmin` | `minioadmin` |
+
+> **Nota:** O container de inicialização `mc` cria automaticamente o bucket `ged-documents` ao subir o compose.
 
 ---
 
 ## ⚙️ Configuração e Execução
 
+### 🔐 Acesso à API (Carga Inicial)
+A aplicação utiliza **Spring Security com JWT**. Para realizar as requisições após o boot, utilize as credenciais padrão criadas via migrações:
+
+| Perfil | Usuário | Senha |
+| :--- | :--- | :--- |
+| **ADMIN** | `admin` | `admin123` |
+| **USER** | `dhenSouza` | `user123` |
+
+*(Nota: Estes dados são apenas para fins de teste local e desafio técnico)*
 ### Executando a Aplicação
 Para rodar em ambiente de desenvolvimento (perfil default):
 ```bash
