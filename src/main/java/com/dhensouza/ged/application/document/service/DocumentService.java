@@ -61,12 +61,7 @@ public class DocumentService {
         );
         versionRepository.save(initialVersion);
 
-        return new DocumentResponse(
-                savedDocument.getId(),
-                savedDocument.getTitle(),
-                savedDocument.getStatus().name(),
-                1
-        );
+        return DocumentResponse.fromEntity(savedDocument);
     }
 
 

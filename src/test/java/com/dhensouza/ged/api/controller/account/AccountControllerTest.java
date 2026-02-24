@@ -1,5 +1,6 @@
 package com.dhensouza.ged.api.controller.account;
 
+import com.dhensouza.ged.BaseIntegrationTest;
 import com.dhensouza.ged.application.account.dto.request.CreateAccountRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,13 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class AccountControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class AccountControllerTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should register a USER account and return 201 Created")

@@ -3,6 +3,7 @@ package com.dhensouza.ged.application.document.service;
 import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
 import com.dhensouza.ged.application.document.dto.request.FileUploadRequest;
 import com.dhensouza.ged.application.document.dto.request.UpdateDocumentMetadataRequest;
+import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.entity.Document;
 import com.dhensouza.ged.domain.enums.AuditAction;
@@ -47,8 +48,11 @@ class DocumentServiceTest {
         when(accountRepository.findById(uploaderId)).thenReturn(Optional.of(mock(Account.class)));
         when(documentRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        documentService.createDocument(request);
+        DocumentResponse response = documentService.createDocument(request);
 
+        assertNotNull(response);
+        assertEquals("Contract", response.title());
+        assertNotNull(response.createdAt());
         verify(documentRepository, times(1)).save(any());
         verify(versionRepository, times(1)).save(any());
     }
