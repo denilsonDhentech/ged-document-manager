@@ -1,5 +1,6 @@
 package com.dhensouza.ged.api.controller.account;
 
+import com.dhensouza.ged.BaseIntegrationTest;
 import com.dhensouza.ged.application.auth.service.TokenService;
 import com.dhensouza.ged.domain.entity.Account;
 import org.junit.jupiter.api.DisplayName;
@@ -17,10 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class AccountAuthorizationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+class AccountAuthorizationTest extends BaseIntegrationTest {
 
     @Autowired
     private TokenService tokenService;

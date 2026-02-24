@@ -1,17 +1,16 @@
 package com.dhensouza.ged.api.controller.document;
 
+import com.dhensouza.ged.BaseIntegrationTest;
 import com.dhensouza.ged.application.auth.service.TokenService;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.entity.Document;
 import com.dhensouza.ged.domain.repository.AccountRepository;
 import com.dhensouza.ged.domain.repository.DocumentRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -22,10 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 @ActiveProfiles("test")
-class DocumentSearchControllerTest {
+class DocumentSearchControllerTest extends BaseIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private TokenService tokenService;
@@ -35,12 +32,6 @@ class DocumentSearchControllerTest {
 
     @Autowired
     private DocumentRepository documentRepository;
-
-    @BeforeEach
-    void setUp() {
-        documentRepository.deleteAll();
-        accountRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("Should list only documents belonging to the authenticated user's tenant")

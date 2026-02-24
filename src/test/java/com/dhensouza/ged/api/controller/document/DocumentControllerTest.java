@@ -1,5 +1,6 @@
 package com.dhensouza.ged.api.controller.document;
 
+import com.dhensouza.ged.BaseIntegrationTest;
 import com.dhensouza.ged.application.auth.service.TokenService;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.repository.AccountRepository;
@@ -23,24 +24,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class DocumentControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class DocumentControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private TokenService tokenService;
 
     @Autowired
     private AccountRepository accountRepository;
-
-    @BeforeEach
-    void setUp() {
-        accountRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("Should create document and associate with the authenticated user's tenant")

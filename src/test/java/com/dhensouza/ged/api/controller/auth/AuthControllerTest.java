@@ -1,5 +1,6 @@
 package com.dhensouza.ged.api.controller.auth;
 
+import com.dhensouza.ged.BaseIntegrationTest;
 import com.dhensouza.ged.application.auth.dto.request.LoginRequest;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.repository.AccountRepository;
@@ -22,13 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class AuthControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+public class AuthControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private AccountRepository accountRepository;
@@ -38,11 +33,8 @@ public class AuthControllerTest {
 
     @BeforeEach
     void setup() {
-        accountRepository.deleteAll();
-
         String passwordEncoded = passwordEncoder.encode("admin123");
         Account account = Account.create("dhen", passwordEncoded, "ADMIN", "tenant-1");
-
         accountRepository.save(account);
     }
 
