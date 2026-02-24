@@ -1,6 +1,5 @@
 package com.dhensouza.ged;
 
-import com.dhensouza.ged.infrastructure.storage.S3StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -23,9 +22,6 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @MockitoBean
-    private S3StorageService storageService;
 
     @MockitoBean
     private S3Client s3Client;
