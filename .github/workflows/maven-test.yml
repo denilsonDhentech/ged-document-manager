@@ -10,6 +10,22 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: ged_db_test
+          POSTGRES_USER: administratorTest
+          POSTGRES_PASSWORD: admin123Test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -20,15 +36,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Start Docker Containers
-        run: docker compose up -d
-
-      - name: Wait for Postgres to be ready
-        run: |
-          until docker exec ged_postgres pg_isready ; do
-            echo "Waiting for Postgres..."
-            sleep 2
-          done
+      - name: Start MinIO Storage
+        run: docker compose up -d minio createbuckets
 
       - name: Build and Test with Maven
         run: ./mvnw test -Ptest

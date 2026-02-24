@@ -23,15 +23,23 @@ public class AuthService {
     }
 
     public LoginResponse authenticate(LoginRequest request) {
+        System.out.println("Iniciando autenticação para: " + request.username());
+
         Account account = accountRepository.findByUsername(request.username())
-                .orElseThrow(() -> new BusinessRuleException("Invalid username or password."));
+                .orElseThrow(() -> new BusinessRuleException("Usuário não encontrado"));
 
         if (!passwordEncoder.matches(request.password(), account.getPassword())) {
-            throw new BusinessRuleException("Invalid username or password.");
+            System.out.println("Senha incorreta!");
+            throw new BusinessRuleException("Credenciais inválidas");
         }
 
-        String token = tokenService.generateToken(account);
-
-        return new LoginResponse(token);
+        try {
+            System.out.println("Gerando token...");
+            String token = tokenService.generateToken(account);
+            return new LoginResponse(token);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessRuleException("Erro ao gerar token: " + e.getMessage());
+        }
     }
 }

@@ -1,10 +1,8 @@
 package com.dhensouza.ged.api.controller.document;
 
 import com.dhensouza.ged.api.controller.document.dto.DocumentCreateWebDTO;
-import com.dhensouza.ged.application.document.dto.DocumentVersionWebDTO;
 import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
 import com.dhensouza.ged.application.document.dto.request.DocumentFilter;
-import com.dhensouza.ged.application.document.dto.request.FileUploadRequest;
 import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
 import com.dhensouza.ged.application.document.service.DocumentSearchService;
 import com.dhensouza.ged.application.document.service.DocumentService;
@@ -16,12 +14,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -36,18 +39,21 @@ public class DocumentController {
         this.searchService = searchService;
     }
 
-    @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentResponse> create(
-            @RequestBody @Valid DocumentCreateWebDTO webDto,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
+            @RequestPart("data") String webDtoRaw,
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal Jwt jwt) throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        DocumentCreateWebDTO webDto = objectMapper.readValue(webDtoRaw, DocumentCreateWebDTO.class);
+
         UUID userId = UUID.fromString(jwt.getSubject());
-        String tenantId = jwt.getClaim("tenantId");
+        String tenantId = jwt.getClaimAsString("tenantId");
 
         CreateDocumentRequest serviceRequest = webDto.toServiceRequest(userId, tenantId);
-        DocumentResponse response = documentService.createDocument(serviceRequest);
 
+        DocumentResponse response = documentService.createDocument(serviceRequest, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -70,22 +76,10 @@ public class DocumentController {
     @PostMapping("/{id}/versions")
     public ResponseEntity<Void> uploadVersion(
             @PathVariable UUID id,
-            @RequestBody @Valid DocumentVersionWebDTO webDto,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        UUID uploaderId = UUID.fromString(jwt.getSubject());
+            @RequestParam UUID uploaderId,
+            @RequestPart("file") MultipartFile file) throws Exception {
 
-        FileUploadRequest serviceRequest = new FileUploadRequest(
-                id,
-                uploaderId,
-                webDto.fileKey(),
-                webDto.checksum(),
-                webDto.fileSize(),
-                webDto.fileType()
-        );
-
-        documentService.uploadNewVersion(serviceRequest);
-
+        documentService.uploadNewVersion(id, uploaderId, file);
         return ResponseEntity.noContent().build();
     }
 
@@ -98,5 +92,18 @@ public class DocumentController {
     ) {
         documentService.changeStatus(id, newStatus);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/versions/{versionNumber}/download")
+    public ResponseEntity<Map<String, String>> getDownloadUrl(
+            @PathVariable UUID id,
+            @PathVariable int versionNumber,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        String downloadUrl = documentService.generateDownloadUrl(id, versionNumber, userId);
+
+        return ResponseEntity.ok(Map.of("url", downloadUrl));
     }
 }

@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Map;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,24 +34,25 @@ class DocumentControllerTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Should create document and associate with the authenticated user's tenant")
     void shouldCreateDocumentSuccessfully() throws Exception {
-        Account account = Account.create("john_doe", "hashed_pass", "USER", "tenant-123");
-        accountRepository.save(account);
-
+        Account account = accountRepository.save(Account.create("john_doe", "hashed_pass", "USER", "tenant-123"));
         String token = tokenService.generateToken(account);
 
-        Map<String, Object> request = Map.of(
+        Map<String, Object> metadata = Map.of(
                 "title", "Monthly Report",
                 "description", "Billing PDF",
-                "fileKey", "s3://bucket/file.pdf",
-                "checksum", "a1b2c3d4",
-                "fileSize", 1024L,
-                "fileType", "application/pdf"
+                "tags", List.of("Finance")
         );
 
-        mockMvc.perform(post("/api/documents")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        MockMultipartFile metadataPart = new MockMultipartFile("data", "",
+                MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(metadata));
+
+        MockMultipartFile filePart = new MockMultipartFile("file", "test.pdf",
+                MediaType.APPLICATION_PDF_VALUE, "PDF Content".getBytes());
+
+        mockMvc.perform(multipart("/api/documents")
+                        .file(metadataPart)
+                        .file(filePart)
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("Monthly Report"));
     }

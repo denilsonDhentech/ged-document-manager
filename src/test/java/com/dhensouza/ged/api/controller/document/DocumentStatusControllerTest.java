@@ -2,7 +2,6 @@ package com.dhensouza.ged.api.controller.document;
 
 import com.dhensouza.ged.BaseIntegrationTest;
 import com.dhensouza.ged.application.auth.service.TokenService;
-import com.dhensouza.ged.application.document.dto.DocumentVersionWebDTO;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.entity.Document;
 import com.dhensouza.ged.domain.enums.DocumentStatus;
@@ -12,11 +11,11 @@ import com.dhensouza.ged.domain.repository.DocumentRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class DocumentStatusControllerTest extends BaseIntegrationTest {
@@ -36,12 +35,12 @@ public class DocumentStatusControllerTest extends BaseIntegrationTest {
         documentRepository.save(doc);
 
         String token = tokenService.generateToken(user);
-        DocumentVersionWebDTO request = new DocumentVersionWebDTO("key", "hash", 100L, "pdf");
+        MockMultipartFile filePart = new MockMultipartFile("file", "test.pdf", "application/pdf", "bytes".getBytes());
 
-        mockMvc.perform(post("/api/documents/{id}/versions", doc.getId())
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(multipart("/api/documents/{id}/versions", doc.getId())
+                        .file(filePart)
+                        .queryParam("uploaderId", user.getId().toString())
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnprocessableEntity());
     }
 

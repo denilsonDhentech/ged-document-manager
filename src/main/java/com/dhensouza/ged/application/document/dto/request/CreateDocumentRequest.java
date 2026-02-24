@@ -8,9 +8,5 @@ public record CreateDocumentRequest(
         String description,
         List<String> tags,
         UUID uploaderId,
-        String tenantId,
-        String fileKey,
-        String checksum,
-        Long fileSize,
-        String fileType
+        String tenantId
 ) {}
