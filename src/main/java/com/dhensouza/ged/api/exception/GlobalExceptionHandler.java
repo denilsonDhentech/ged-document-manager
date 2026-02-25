@@ -7,10 +7,12 @@ import com.dhensouza.ged.domain.exception.ErrorType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.List;
 
@@ -69,6 +71,17 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 ErrorType.INTERNAL_SERVER_ERROR,
                 "An unexpected internal error occurred",
+                request,
+                null
+        );
+    }
+
+    @ExceptionHandler({AuthorizationDeniedException.class, AccessDeniedException.class})
+    public ResponseEntity<StandardError> handleAccessDenied(Exception e, HttpServletRequest request) {
+        return buildResponse(
+                HttpStatus.FORBIDDEN,
+                ErrorType.ACCESS_DENIED,
+                "You do not have permission to access this resource",
                 request,
                 null
         );
