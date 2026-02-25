@@ -1,6 +1,6 @@
 package com.dhensouza.ged.api.controller.account;
 
-import com.dhensouza.ged.application.account.dto.request.CreateAccountRequest;
+import com.dhensouza.ged.api.controller.account.dto.request.CreateAccountRequest;
 import com.dhensouza.ged.application.account.dto.response.AccountResponse;
 import com.dhensouza.ged.application.account.service.AccountService;
 import jakarta.validation.Valid;

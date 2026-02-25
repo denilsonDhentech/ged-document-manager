@@ -129,6 +129,47 @@ Para testar os endpoints protegidos diretamente pela interface:
 * **UUID v4:** Todas as entidades utilizam UUIDs como chaves primárias, evitando a exposição de IDs sequenciais e aumentando a segurança contra ataques de enumeração.
 * **Sem Lombok:** Opção por código Java explícito para demonstrar domínio de POJOs, encapsulamento e estrutura fundamental da linguagem.
 
+## 🧠 Estratégia de Multi-tenancy (Isolamento de Dados)
+  A aplicação foi projetada utilizando a abordagem de Shared Schema, onde os dados de diferentes organizações coexistem na mesma tabela, mas são isolados logicamente via uma coluna tenant_id.
+
+* **Segurança Baseada** em Token: O tenantId é extraído diretamente das claims do Token JWT durante o processo de autenticação. Isso impede que um usuário mal-intencionado altere o contexto de dados através do corpo da requisição.
+
+* **Filtragem Automática:** Todas as consultas ao banco de dados utilizam o DocumentSpecifications.hasTenant(tenantId), garantindo que um usuário nunca visualize ou manipule documentos de outra organização, atendendo ao requisito de isolamento do MVP.
+
+### 📝 Validação de Input e Integridade
+* ** Utilizamos o Jakarta Bean Validation integrado aos Java Records para garantir que a API seja resiliente a dados malformados.
+
+* **Constraints Robustas:** Campos críticos como title possuem validações de presença (@NotBlank) e limites de tamanho (@Size), refletidas automaticamente na documentação Swagger.
+
+* **Padronização de Erros:** Implementamos um GlobalExceptionHandler que captura falhas de validação e retorna um JSON estruturado com status 400 Bad Request, facilitando o tratamento de erros no Front-end Angular.
+
+📤 Abordagem de Upload (Multipart Form)
+* Diferente de APIs puramente JSON, a criação de documentos utiliza o padrão multipart/form-data para suportar o envio simultâneo de metadados e arquivos binários.
+
+* Uso de @ModelAttribute: Optamos por esta anotação para permitir um mapeamento "achatado" (flat) dos campos de texto. Isso garante maior compatibilidade com bibliotecas de Front-end e ferramentas de teste, evitando problemas comuns de Content-Type em partes individuais da requisição.
+
+* Versionamento Incremental: Cada upload é processado como uma transação única que gera um novo registro na trilha de auditoria e incrementa a versão do documento no storage.
+
+---
+## 🧪 Guia de Testes (Insomnia / Postman)
+
+Como o endpoint de criação utiliza Multipart Form, a configuração do teste exige atenção aos detalhes de cada campo:
+
+* Criando um Novo Documento  Método & URL: POST para http://localhost:8080/api/documents
+
+* Autenticação: Selecione Bearer Token e insira o JWT gerado no login.
+
+Corpo (Body): Selecione Multipart Form e adicione as seguintes chaves:
+
+| Key | Value | Type |
+| :--- | :--- | :--- |
+| **title** | Meu Documento Técnico | Text |
+| **description** | Descrição de teste para o desafio | Text |
+| **tags** | JAVA | Text |
+| **tags** | SPRING | Text |
+| **file** | *(Selecione um arquivo PDF/PNG/JPG)* | File |
+
+
 ---
 
 **Desenvolvido por DhenSouza**
