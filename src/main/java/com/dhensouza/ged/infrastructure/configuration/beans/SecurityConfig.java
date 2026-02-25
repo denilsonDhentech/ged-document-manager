@@ -1,6 +1,6 @@
-package com.dhensouza.ged.infrastructure.configuration;
+package com.dhensouza.ged.infrastructure.configuration.beans;
 
-import com.dhensouza.ged.infrastructure.configuration.security.KeyUtils;
+import com.dhensouza.ged.infrastructure.configuration.beans.security.KeyUtils;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -44,6 +44,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/accounts").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

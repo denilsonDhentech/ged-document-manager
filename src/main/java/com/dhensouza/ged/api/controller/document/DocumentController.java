@@ -8,7 +8,7 @@ import com.dhensouza.ged.application.document.service.DocumentSearchService;
 import com.dhensouza.ged.application.document.service.DocumentService;
 import com.dhensouza.ged.domain.entity.Document;
 import com.dhensouza.ged.domain.enums.DocumentStatus;
-import jakarta.validation.Valid;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,8 +21,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 import java.util.UUID;

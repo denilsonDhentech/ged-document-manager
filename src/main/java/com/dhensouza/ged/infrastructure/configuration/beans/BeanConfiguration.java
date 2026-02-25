@@ -1,4 +1,4 @@
-package com.dhensouza.ged.infrastructure.configuration;
+package com.dhensouza.ged.infrastructure.configuration.beans;
 
 import com.dhensouza.ged.application.account.service.AccountService;
 import com.dhensouza.ged.application.document.service.DocumentService;
@@ -11,7 +11,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 public class BeanConfiguration {
