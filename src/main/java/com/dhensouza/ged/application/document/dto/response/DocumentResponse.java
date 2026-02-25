@@ -12,13 +12,19 @@ public record DocumentResponse(
         Integer versionCount,
         LocalDateTime createdAt
 ) {
-    public static DocumentResponse fromEntity(Document doc) {
+
+    public static DocumentResponse fromEntity(Document doc, int versionCount) {
         return new DocumentResponse(
                 doc.getId(),
                 doc.getTitle(),
                 doc.getStatus().name(),
-                0,
+                versionCount,
                 doc.getCreatedAt()
         );
+    }
+
+
+    public static DocumentResponse fromEntity(Document doc) {
+        return fromEntity(doc, 0);
     }
 }

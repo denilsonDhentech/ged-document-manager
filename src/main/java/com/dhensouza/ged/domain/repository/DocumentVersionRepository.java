@@ -15,4 +15,6 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
     Optional<Integer> findMaxVersionByDocumentId(@Param("documentId") UUID documentId);
 
     Optional<DocumentVersion> findByDocumentIdAndVersionNumber(UUID docId, int versionNumber);
+
+    long countByDocumentId(UUID documentId);
 }
