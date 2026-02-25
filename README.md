@@ -9,6 +9,7 @@ Sistema de Gestão Eletrônica de Documentos (GED) desenvolvido como parte de um
 - [Infraestrutura com Docker](#-infraestrutura-com-docker)
 - [Configuração e Execução](#️-configuração-e-execução)
 - [Estratégia de Testes](#-estratégia-de-testes)
+- [Documentação da API](#-documentação-da-api-swagger)
 - [Decisões Técnicas](#-decisões-técnicas)
 
 ---
@@ -102,6 +103,23 @@ Para rodar a suíte completa de testes:
 * **Banco em Pipeline:** A pipeline CI no GitHub Actions provisiona automaticamente um Postgres via `services` na porta **5433** para execução dos testes.
 
 ---
+
+## 📖 Documentação da API (Swagger)
+
+A API utiliza **SpringDoc OpenAPI 3** para gerar documentação interativa e padronizada. Como o projeto utiliza tecnologias de ponta (**Spring Boot 4.0.3**), a documentação está configurada para refletir automaticamente todos os endpoints, esquemas de dados e requisitos de segurança.
+
+### Acessando a Interface
+Com a aplicação em execução, acesse os seguintes endereços no seu navegador:
+
+- **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **OpenAPI Spec (JSON):** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+
+### Autenticação no Swagger
+Para testar os endpoints protegidos diretamente pela interface:
+1. Realize o login no endpoint de autenticação.
+2. Copie o **Token JWT** gerado.
+3. No Swagger UI, clique no botão **"Authorize"** (ícone de cadeado).
+4. Insira o token e aplique para liberar as requisições com os perfis `ADMIN`, `USER` ou `VIEWER`.
 
 ## 🧠 Decisões Técnicas
 

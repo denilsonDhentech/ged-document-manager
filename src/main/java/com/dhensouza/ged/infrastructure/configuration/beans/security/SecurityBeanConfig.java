@@ -1,4 +1,4 @@
-package com.dhensouza.ged.infrastructure.configuration.security;
+package com.dhensouza.ged.infrastructure.configuration.beans.security;
 
 import com.dhensouza.ged.application.auth.service.AuthService;
 import com.dhensouza.ged.application.auth.service.TokenService;

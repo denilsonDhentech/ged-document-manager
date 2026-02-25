@@ -1,4 +1,4 @@
-package com.dhensouza.ged.infrastructure.configuration.document;
+package com.dhensouza.ged.infrastructure.configuration.beans.document;
 
 import com.dhensouza.ged.application.document.service.DocumentSearchService;
 import com.dhensouza.ged.domain.repository.DocumentRepository;

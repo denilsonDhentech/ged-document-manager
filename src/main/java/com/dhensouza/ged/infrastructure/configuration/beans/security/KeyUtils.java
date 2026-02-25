@@ -1,4 +1,4 @@
-package com.dhensouza.ged.infrastructure.configuration.security;
+package com.dhensouza.ged.infrastructure.configuration.beans.security;
 
 import org.springframework.stereotype.Component;
 
