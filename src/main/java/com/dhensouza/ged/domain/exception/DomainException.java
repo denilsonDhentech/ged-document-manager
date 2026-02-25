@@ -1,7 +1,14 @@
 package com.dhensouza.ged.domain.exception;
 
 public abstract class DomainException extends RuntimeException {
-    protected DomainException(String message) {
+    private final ErrorType errorType;
+
+    protected DomainException(ErrorType errorType, String message) {
         super(message);
+        this.errorType = errorType;
+    }
+
+    public ErrorType getErrorType() {
+        return errorType;
     }
 }
