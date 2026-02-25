@@ -63,7 +63,7 @@ public class DocumentService {
 
         auditLogRepository.save(AuditLog.logDocumentCreation(uploader, savedDocument.getId()));
 
-        return DocumentResponse.fromEntity(savedDocument);
+        return DocumentResponse.fromEntity(savedDocument, 1);
     }
 
 

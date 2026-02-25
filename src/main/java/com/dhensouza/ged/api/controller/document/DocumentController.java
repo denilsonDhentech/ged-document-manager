@@ -64,9 +64,7 @@ public class DocumentController {
     ) {
         String tenantId = jwt.getClaim("tenantId");
 
-        Page<Document> result = searchService.search(filter, tenantId, pageable);
-
-        Page<DocumentResponse> response = result.map(DocumentResponse::fromEntity);
+        Page<DocumentResponse> response = searchService.search(filter, tenantId, pageable);
 
         return ResponseEntity.ok(response);
     }
