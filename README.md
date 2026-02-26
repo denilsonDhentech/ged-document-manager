@@ -169,7 +169,17 @@ Corpo (Body): Selecione Multipart Form e adicione as seguintes chaves:
 | **tags** | SPRING | Text |
 | **file** | *(Selecione um arquivo PDF/PNG/JPG)* | File |
 
+## --- GESTÃO DE VERSÕES E HISTÓRICO ---
 
+1. ENDPOINT DE HISTÓRICO:
+- Implementado o endpoint GET /api/documents/{id}/versions para fornecer a trilha completa de evolução de cada arquivo.
+- A listagem é retornada em ordem decrescente (mais recente primeiro) para priorizar a visualização do estado atual do documento.
+
+2. SEGURANÇA NA CAMADA DE SERVIÇO:
+- O método listVersions realiza uma verificação prévia de existência do documento pai, lançando EntityNotFoundException caso o ID seja inválido, evitando inconsistências na resposta da API.
+
+3. OTIMIZAÇÃO DE DTO (DocumentVersionResponse):
+- O mapeamento no Service extrai apenas o 'username' do objeto 'Account' associado à versão. Isso isola dados sensíveis do usuário (como senhas ou tokens) e garante que o Front-end receba uma estrutura leve e pronta para exibição em tabelas.
 ---
 
 **Desenvolvido por DhenSouza**
