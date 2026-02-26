@@ -1,6 +1,10 @@
 package com.dhensouza.ged.domain.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.util.UUID;
 
 @Entity
@@ -68,6 +72,8 @@ public class Account {
     public void changeRole(String newRole) {
         this.role = newRole;
     }
+
+    public void changeTenantId(String tenantId) { this.tenantId = tenantId; }
 
     public static Account create(String username, String password, String role, String tenantId) {
         return new Account(username, password, role, tenantId);

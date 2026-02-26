@@ -1,6 +1,7 @@
 package com.dhensouza.ged.api.controller.account;
 
 import com.dhensouza.ged.api.controller.account.dto.request.CreateAccountRequest;
+import com.dhensouza.ged.api.controller.account.dto.request.UpdateAccountRequest;
 import com.dhensouza.ged.application.account.dto.response.AccountResponse;
 import com.dhensouza.ged.application.account.service.AccountService;
 import jakarta.validation.Valid;
@@ -32,5 +33,20 @@ public class AccountController {
     public ResponseEntity<List<AccountResponse>> listAll() {
         List<AccountResponse> accounts = accountService.findAll();
         return ResponseEntity.ok(accounts);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<AccountResponse> update(
+            @PathVariable java.util.UUID id,
+            @RequestBody @Valid UpdateAccountRequest request) {
+        return ResponseEntity.ok(accountService.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable java.util.UUID id) {
+        accountService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
