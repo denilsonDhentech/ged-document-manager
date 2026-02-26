@@ -7,6 +7,7 @@ Sistema de Gestão Eletrônica de Documentos (GED) desenvolvido como parte de um
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Tecnologias](#-tecnologias)
 - [Infraestrutura com Docker](#-infraestrutura-com-docker)
+- [Credenciais de Acesso](#-Credenciais-de-Acesso)
 - [Configuração e Execução](#️-configuração-e-execução)
 - [Estratégia de Testes](#-estratégia-de-testes)
 - [Documentação da API](#-documentação-da-api-swagger)
@@ -71,10 +72,22 @@ docker compose up -d
 > **Nota:** O container de inicialização `mc` cria automaticamente o bucket `ged-documents` ao subir o compose.
 
 ---
+## 🔑 Credenciais de Acesso
+
+Para validar o controle de permissões (**RBAC**) e as funcionalidades exclusivas de cada nível de acesso, utilize as contas abaixo:
+
+| Perfil | Usuário | Senha | Acessos Exclusivos |
+| :--- | :--- | :--- | :--- |
+| **ADMIN** | `admin` | `admin123` | Gestão de Usuários e Trilha de Auditoria |
+| **USER** | `dhenSouza` | `user123` | Gestão de Documentos e Upload de Versões |
+
+> **Dica de Teste:** Ao logar como **ADMIN**, note que o menu lateral e as ações de edição de usuários estarão visíveis. Ao logar como **USER**, essas opções são ocultadas automaticamente pela lógica de Signals e Guards do Angular.
+---
 
 ## ⚙️ Configuração e Execução
 
-### 🔐 Acesso à API (Carga Inicial)
+ **🔐 Acesso à API (Carga Inicial)**
+
 A aplicação utiliza **Spring Security com JWT**. Para realizar as requisições após o boot, utilize as credenciais padrão criadas via migrações:
 
 | Perfil | Usuário | Senha |
