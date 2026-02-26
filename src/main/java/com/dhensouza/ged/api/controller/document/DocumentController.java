@@ -4,6 +4,7 @@ import com.dhensouza.ged.api.controller.document.dto.DocumentCreateWebDTO;
 import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
 import com.dhensouza.ged.application.document.dto.request.DocumentFilter;
 import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
+import com.dhensouza.ged.application.document.dto.response.DocumentVersionResponse;
 import com.dhensouza.ged.application.document.service.DocumentSearchService;
 import com.dhensouza.ged.application.document.service.DocumentService;
 import com.dhensouza.ged.domain.enums.DocumentStatus;
@@ -21,6 +22,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -99,5 +101,12 @@ public class DocumentController {
         String downloadUrl = documentService.generateDownloadUrl(id, versionNumber, userId);
 
         return ResponseEntity.ok(Map.of("url", downloadUrl));
+    }
+
+    @GetMapping("/{id}/versions/history")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER', 'VIEWER')")
+    public ResponseEntity<List<DocumentVersionResponse>> getVersionHistory(@PathVariable UUID id) {
+        List<DocumentVersionResponse> history = documentService.listVersions(id);
+        return ResponseEntity.ok(history);
     }
 }

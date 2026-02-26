@@ -3,6 +3,7 @@ package com.dhensouza.ged.application.document.service;
 import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
 import com.dhensouza.ged.application.document.dto.request.UpdateDocumentMetadataRequest;
 import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
+import com.dhensouza.ged.application.document.dto.response.DocumentVersionResponse;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.entity.AuditLog;
 import com.dhensouza.ged.domain.entity.Document;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.MessageDigest;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.UUID;
 
 public class DocumentService {
@@ -142,5 +144,23 @@ public class DocumentService {
     private String calculateChecksum(byte[] bytes) throws Exception {
         byte[] hash = MessageDigest.getInstance("SHA-256").digest(bytes);
         return HexFormat.of().formatHex(hash);
+    }
+
+    public List<DocumentVersionResponse> listVersions(UUID documentId) {
+        if (!documentRepository.existsById(documentId)) {
+            throw new EntityNotFoundException("Document not found");
+        }
+
+        return versionRepository.findByDocumentIdWithUploader(documentId)
+                .stream()
+                .map(v -> new DocumentVersionResponse(
+                        v.getVersionNumber(),
+                        v.getFileKey(),
+                        v.getFileSize(),
+                        v.getFileType(),
+                        v.getUploader().getUsername(),
+                        v.getUploadedAt(),
+                        v.getChecksum()
+                )).toList();
     }
 }
