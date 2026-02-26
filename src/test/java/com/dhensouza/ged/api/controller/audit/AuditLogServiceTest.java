@@ -1,5 +1,5 @@
 package com.dhensouza.ged.api.controller.audit;
-import com.dhensouza.ged.api.controller.audit.dto.response.AuditLogResponse;
+import com.dhensouza.ged.application.audit.dto.response.AuditLogResponse;
 import com.dhensouza.ged.application.audit.service.AuditLogService;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.entity.AuditLog;

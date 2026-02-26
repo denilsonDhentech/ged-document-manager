@@ -1,8 +1,7 @@
 package com.dhensouza.ged.api.controller.audit;
 
-import com.dhensouza.ged.api.controller.audit.dto.response.AuditLogResponse;
+import com.dhensouza.ged.application.audit.dto.response.AuditLogResponse;
 import com.dhensouza.ged.application.audit.service.AuditLogService;
-import com.dhensouza.ged.domain.repository.AuditLogRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

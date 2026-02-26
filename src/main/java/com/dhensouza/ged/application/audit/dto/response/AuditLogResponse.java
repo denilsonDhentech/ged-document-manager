@@ -1,4 +1,4 @@
-package com.dhensouza.ged.api.controller.audit.dto.response;
+package com.dhensouza.ged.application.audit.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
