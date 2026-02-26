@@ -30,6 +30,7 @@ public class AccountController {
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<AccountResponse>> listAll() {
-        return ResponseEntity.ok(java.util.Collections.emptyList());
+        List<AccountResponse> accounts = accountService.findAll();
+        return ResponseEntity.ok(accounts);
     }
 }

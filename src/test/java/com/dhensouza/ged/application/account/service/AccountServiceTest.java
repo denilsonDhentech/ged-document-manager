@@ -57,4 +57,24 @@ class AccountServiceTest {
 
         verify(repository, never()).save(any());
     }
+
+    @Test
+    @DisplayName("Should return a list of AccountResponse when multiple accounts exist")
+    void shouldReturnListOfAccounts() {
+        // GIVEN
+        Account account1 = Account.create("user.one", "pwd1", "ADMIN", "T1");
+        Account account2 = Account.create("user.two", "pwd2", "USER", "T1");
+
+        when(repository.findAll()).thenReturn(java.util.List.of(account1, account2));
+
+        java.util.List<AccountResponse> result = service.findAll();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("user.one", result.get(0).username());
+        assertEquals("user.two", result.get(1).username());
+
+        verify(repository, times(1)).findAll();
+        verifyNoMoreInteractions(passwordEncoder);
+    }
 }
