@@ -3,10 +3,13 @@ package com.dhensouza.ged.application.document.service;
 import com.dhensouza.ged.application.document.dto.request.CreateDocumentRequest;
 import com.dhensouza.ged.application.document.dto.request.UpdateDocumentMetadataRequest;
 import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
+import com.dhensouza.ged.application.document.dto.response.DocumentVersionResponse;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.entity.Document;
+import com.dhensouza.ged.domain.entity.DocumentVersion;
 import com.dhensouza.ged.domain.enums.DocumentStatus;
 import com.dhensouza.ged.domain.exception.BusinessRuleException;
+import com.dhensouza.ged.domain.exception.EntityNotFoundException;
 import com.dhensouza.ged.domain.repository.AccountRepository;
 import com.dhensouza.ged.domain.repository.AuditLogRepository;
 import com.dhensouza.ged.domain.repository.DocumentRepository;
@@ -128,5 +131,48 @@ class DocumentServiceTest {
 
         assertEquals("New Title", existingDoc.getTitle());
         verify(documentRepository).save(existingDoc);
+    }
+
+    @Test
+    @DisplayName("Should return version history list ordered by version number descending")
+    void shouldReturnVersionHistoryListOrderedByVersionNumberDescending() {
+        UUID docId = UUID.randomUUID();
+        Account uploader = mock(Account.class);
+        when(uploader.getUsername()).thenReturn("john_doe");
+
+        Document doc = mock(Document.class);
+        var v1 = new DocumentVersion(doc, 1, "key1", "hash1", 1024L, "application/pdf", uploader);
+        var v2 = new DocumentVersion(doc, 2, "key2", "hash2", 2048L, "application/pdf", uploader);
+
+        when(documentRepository.existsById(docId)).thenReturn(true);
+        when(versionRepository.findByDocumentIdWithUploader(docId)).thenReturn(List.of(v2, v1));
+
+        List<DocumentVersionResponse> history = documentService.listVersions(docId);
+
+        assertNotNull(history);
+        assertEquals(2, history.size());
+
+        assertEquals(2, history.get(0).versionNumber());
+        assertEquals("john_doe", history.get(0).uploadedBy());
+        assertEquals(2048L, history.get(0).size());
+
+        assertEquals(1, history.get(1).versionNumber());
+        assertEquals("hash1", history.get(1).checksum());
+
+        verify(documentRepository, times(1)).existsById(docId);
+        verify(versionRepository, times(1)).findByDocumentIdWithUploader(docId);
+    }
+
+    @Test
+    @DisplayName("Should throw EntityNotFoundException when document does not exist for history")
+    void shouldThrowExceptionWhenDocumentNotFoundForHistory() {
+        UUID invalidDocId = UUID.randomUUID();
+        when(documentRepository.existsById(invalidDocId)).thenReturn(false);
+
+        assertThrows(EntityNotFoundException.class, () ->
+                documentService.listVersions(invalidDocId)
+        );
+
+        verify(versionRepository, never()).findByDocumentIdWithUploader(any());
     }
 }

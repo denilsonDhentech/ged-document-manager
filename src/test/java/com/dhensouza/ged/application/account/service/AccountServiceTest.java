@@ -1,6 +1,7 @@
 package com.dhensouza.ged.application.account.service;
 
 import com.dhensouza.ged.api.controller.account.dto.request.CreateAccountRequest;
+import com.dhensouza.ged.api.controller.account.dto.request.UpdateAccountRequest;
 import com.dhensouza.ged.application.account.dto.response.AccountResponse;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.exception.BusinessRuleException;
@@ -76,5 +77,42 @@ class AccountServiceTest {
 
         verify(repository, times(1)).findAll();
         verifyNoMoreInteractions(passwordEncoder);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when updating to a username that is already taken")
+    void shouldThrowExceptionWhenUpdatingToTakenUsername() {
+        java.util.UUID id = java.util.UUID.randomUUID();
+        UpdateAccountRequest request = new UpdateAccountRequest("existing_user", "pass123", "USER", "T1");
+        Account currentAccount = Account.create("old_user", "pwd", "USER", "T1");
+        Account otherAccount = Account.create("existing_user", "pwd2", "ADMIN", "T1");
+
+        when(repository.findById(id)).thenReturn(java.util.Optional.of(currentAccount));
+        when(repository.findByUsername("existing_user")).thenReturn(java.util.Optional.of(otherAccount));
+
+        assertThrows(BusinessRuleException.class, () -> service.update(id, request));
+    }
+
+    @Test
+    @DisplayName("Should delete account successfully when ID exists")
+    void shouldDeleteAccountSuccessfully() {
+        java.util.UUID id = java.util.UUID.randomUUID();
+        when(repository.existsById(id)).thenReturn(true);
+
+        assertDoesNotThrow(() -> service.delete(id));
+
+        verify(repository, times(1)).deleteById(id);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when trying to delete non-existent account")
+    void shouldThrowExceptionWhenDeletingNonExistentAccount() {
+        java.util.UUID id = java.util.UUID.randomUUID();
+        when(repository.existsById(id)).thenReturn(false);
+
+        assertThrows(com.dhensouza.ged.domain.exception.EntityNotFoundException.class,
+                () -> service.delete(id));
+
+        verify(repository, never()).deleteById(any());
     }
 }

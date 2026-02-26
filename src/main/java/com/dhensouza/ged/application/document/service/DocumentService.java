@@ -16,6 +16,7 @@ import com.dhensouza.ged.domain.repository.AuditLogRepository;
 import com.dhensouza.ged.domain.repository.DocumentRepository;
 import com.dhensouza.ged.domain.repository.DocumentVersionRepository;
 import com.dhensouza.ged.infrastructure.storage.S3StorageService;
+import jakarta.transaction.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.MessageDigest;
@@ -45,7 +46,7 @@ public class DocumentService {
         this.storageService = storageService;
     }
 
-
+    @Transactional
     public DocumentResponse createDocument(CreateDocumentRequest request, MultipartFile file) throws Exception {
         Account uploader = accountRepository.findById(request.uploaderId())
                 .orElseThrow(() -> new EntityNotFoundException("Uploader account not found"));
@@ -68,7 +69,7 @@ public class DocumentService {
         return DocumentResponse.fromEntity(savedDocument, 1);
     }
 
-
+    @Transactional
     public void updateMetadata(UUID docId, UpdateDocumentMetadataRequest request) {
         Document document = documentRepository.findById(docId)
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
@@ -80,7 +81,7 @@ public class DocumentService {
         AuditLog log = AuditLog.logMetadataUpdate(document.getOwner(), document.getId());
         auditLogRepository.save(log);
     }
-
+    @Transactional
     public void changeStatus(UUID docId, DocumentStatus newStatus) {
         Document document = documentRepository.findById(docId)
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
@@ -93,7 +94,7 @@ public class DocumentService {
 
         auditLogRepository.save(log);
     }
-
+    @Transactional
     public void uploadNewVersion(UUID documentId, UUID uploaderId, MultipartFile file) throws Exception {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
@@ -122,7 +123,7 @@ public class DocumentService {
         auditLogRepository.save(AuditLog.logFileUpload(uploader, document.getId(), nextVersion));
     }
 
-
+    @Transactional
     public String generateDownloadUrl(UUID docId, int versionNumber, UUID userId) {
         Account currentUser = accountRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
