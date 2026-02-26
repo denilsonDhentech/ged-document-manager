@@ -6,9 +6,8 @@ import com.dhensouza.ged.application.document.dto.request.DocumentFilter;
 import com.dhensouza.ged.application.document.dto.response.DocumentResponse;
 import com.dhensouza.ged.application.document.service.DocumentSearchService;
 import com.dhensouza.ged.application.document.service.DocumentService;
-import com.dhensouza.ged.domain.entity.Document;
 import com.dhensouza.ged.domain.enums.DocumentStatus;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -39,19 +38,16 @@ public class DocumentController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentResponse> create(
-            @RequestPart("data") String webDtoRaw,
+            @Valid DocumentCreateWebDTO webDto,
             @RequestPart("file") MultipartFile file,
             @AuthenticationPrincipal Jwt jwt) throws Exception {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        DocumentCreateWebDTO webDto = objectMapper.readValue(webDtoRaw, DocumentCreateWebDTO.class);
 
         UUID userId = UUID.fromString(jwt.getSubject());
         String tenantId = jwt.getClaimAsString("tenantId");
 
         CreateDocumentRequest serviceRequest = webDto.toServiceRequest(userId, tenantId);
-
         DocumentResponse response = documentService.createDocument(serviceRequest, file);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -72,8 +68,10 @@ public class DocumentController {
     @PostMapping("/{id}/versions")
     public ResponseEntity<Void> uploadVersion(
             @PathVariable UUID id,
-            @RequestParam UUID uploaderId,
-            @RequestPart("file") MultipartFile file) throws Exception {
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal Jwt jwt) throws Exception {
+
+        UUID uploaderId = UUID.fromString(jwt.getSubject());
 
         documentService.uploadNewVersion(id, uploaderId, file);
         return ResponseEntity.noContent().build();

@@ -37,22 +37,17 @@ class DocumentControllerTest extends BaseIntegrationTest {
         Account account = accountRepository.save(Account.create("john_doe", "hashed_pass", "USER", "tenant-123"));
         String token = tokenService.generateToken(account);
 
-        Map<String, Object> metadata = Map.of(
-                "title", "Monthly Report",
-                "description", "Billing PDF",
-                "tags", List.of("Finance")
-        );
-
-        MockMultipartFile metadataPart = new MockMultipartFile("data", "",
-                MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(metadata));
-
         MockMultipartFile filePart = new MockMultipartFile("file", "test.pdf",
                 MediaType.APPLICATION_PDF_VALUE, "PDF Content".getBytes());
 
         mockMvc.perform(multipart("/api/documents")
-                        .file(metadataPart)
                         .file(filePart)
-                        .header("Authorization", "Bearer " + token))
+                        .param("title", "Monthly Report")
+                        .param("description", "Billing PDF")
+                        .param("tags", "Finance")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("Monthly Report"));
     }

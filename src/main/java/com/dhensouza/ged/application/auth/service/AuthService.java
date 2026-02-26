@@ -36,7 +36,12 @@ public class AuthService {
         try {
             System.out.println("Gerando token...");
             String token = tokenService.generateToken(account);
-            return new LoginResponse(token);
+            return new LoginResponse(
+                    token,
+                    account.getUsername(),
+                    account.getRole(),
+                    account.getTenantId()
+            );
         } catch (Exception e) {
             e.printStackTrace();
             throw new BusinessRuleException("Erro ao gerar token: " + e.getMessage());

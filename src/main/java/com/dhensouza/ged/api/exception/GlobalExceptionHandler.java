@@ -86,4 +86,17 @@ public class GlobalExceptionHandler {
                 null
         );
     }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<StandardError> handleDataIntegrity(
+            org.springframework.dao.DataIntegrityViolationException e,
+            HttpServletRequest request) {
+
+        String message = "Database integrity violation. This record might already exist.";
+        if (e.getMessage() != null && e.getMessage().contains("accounts_username_key")) {
+            message = "This username is already taken.";
+        }
+
+        return buildResponse(HttpStatus.CONFLICT, ErrorType.BUSINESS_RULE_VIOLATION, message, request, null);
+    }
 }

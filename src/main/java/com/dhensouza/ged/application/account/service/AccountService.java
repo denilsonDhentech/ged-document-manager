@@ -1,12 +1,14 @@
 package com.dhensouza.ged.application.account.service;
 
-import com.dhensouza.ged.application.account.dto.request.CreateAccountRequest;
+import com.dhensouza.ged.api.controller.account.dto.request.CreateAccountRequest;
 import com.dhensouza.ged.application.account.dto.response.AccountResponse;
 import com.dhensouza.ged.domain.entity.Account;
 import com.dhensouza.ged.domain.exception.BusinessRuleException;
 import com.dhensouza.ged.domain.repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 
 public class AccountService {
@@ -36,5 +38,12 @@ public class AccountService {
 
         Account savedAccount = repository.save(account);
         return AccountResponse.fromEntity(savedAccount);
+    }
+
+    public List<AccountResponse> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(AccountResponse::fromEntity)
+                .toList();
     }
 }
