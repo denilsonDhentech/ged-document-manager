@@ -4,14 +4,27 @@ Sistema de Gestão Eletrônica de Documentos (GED) desenvolvido como parte de um
 
 ## 📋 Sumário
 
-- [Sobre o Projeto](#-sobre-o-projeto)
-- [Tecnologias](#-tecnologias)
-- [Infraestrutura com Docker](#-infraestrutura-com-docker)
-- [Credenciais de Acesso](#-Credenciais-de-Acesso)
-- [Configuração e Execução](#️-configuração-e-execução)
-- [Estratégia de Testes](#-estratégia-de-testes)
-- [Documentação da API](#-documentação-da-api-swagger)
-- [Decisões Técnicas](#-decisões-técnicas)
+- [📖 Sobre o Projeto](#-sobre-o-projeto)
+    - [Funcionalidades Principais](#funcionalidades-principais)
+- [🛠 Tecnologias](#-tecnologias)
+- [🐳 Infraestrutura com Docker](#-infraestrutura-com-docker)
+    - [Pré-requisitos](#1-pré-requisitos)
+    - [Subindo os Serviços](#2-subindo-os-serviços)
+    - [Detalhes de Conectividade](#3-detalhes-de-conectividade-e-credenciais)
+- [🔑 Credenciais de Acesso](#-credenciais-de-acesso)
+- [⚙️ Configuração e Execução](#️-configuração-e-execução)
+    - [Acesso à API](#-acesso-à-api-carga-inicial)
+    - [Executando a Aplicação](#executando-a-aplicação)
+- [🧪 Estratégia de Testes](#-estratégia-de-testes)
+- [📖 Documentação da API (Swagger)](#-documentação-da-api-swagger)
+- [🧠 Decisões Técnicas](#-decisões-técnicas)
+    - [Estratégia de Multi-tenancy](#-estratégia-de-multi-tenancy-isolamento-de-dados)
+    - [Validação e Integridade](#-validação-de-input-e-integridade)
+    - [Abordagem de Upload](#-abordagem-de-upload-multipart-form)
+- [🧪 Guia de Testes (Insomnia / Postman)](#-guia-de-testes-insomnia--postman)
+- [📂 Gestão de Versões e Histórico](#-gestão-de-versões-e-histórico-)
+- [⚙️ Gestão de Configurações e Perfis](#️-gestão-de-configurações-e-perfis-profiles)
+- [🔐 Variáveis de Ambiente e Segurança](#-variáveis-de-ambiente-e-segurança)
 
 ---
 
@@ -193,6 +206,20 @@ Corpo (Body): Selecione Multipart Form e adicione as seguintes chaves:
 
 3. OTIMIZAÇÃO DE DTO (DocumentVersionResponse):
 - O mapeamento no Service extrai apenas o 'username' do objeto 'Account' associado à versão. Isso isola dados sensíveis do usuário (como senhas ou tokens) e garante que o Front-end receba uma estrutura leve e pronta para exibição em tabelas.
+---
+## ⚙️ Gestão de Configurações e Perfis (Profiles)
+A aplicação utiliza o recurso de Spring Profiles para separar as configurações de desenvolvimento local das configurações de produção, garantindo portabilidade e segurança.
+
+* Perfil local (Desenvolvimento): Configurado para execução em ambiente controlado. Busca o banco de dados PostgreSQL e o storage MinIO (compatível com S3) rodando localmente via Docker Compose.
+
+* Perfil prod (Produção): Utilizado para o deploy em plataformas Cloud (como Render e Vercel). Neste perfil, a aplicação consome variáveis de ambiente reais para conexão com o PostgreSQL gerenciado e o bucket S3 do Supabase.
+
+## 🔐 Variáveis de Ambiente e Segurança
+Seguindo as boas práticas de segurança, o projeto não armazena credenciais sensíveis (chaves de acesso, senhas de banco) diretamente no código-fonte ou em arquivos versionados. Utilizamos a estratégia de Placeholders que são resolvidos dinamicamente:
+
+Fallbacks Locais: No arquivo application-local.properties, definimos valores padrão (ex: http://localhost:9000 para o MinIO). Isso permite que qualquer desenvolvedor suba o projeto imediatamente após o comando docker-compose up, sem configurações manuais no S3.
+
+ * Injeção em Produção: Em ambiente Cloud, os placeholders (ex: ${STORAGE_S3_ENDPOINT}) são preenchidos automaticamente pelas variáveis de ambiente configuradas no painel administrativo da plataforma (Render/Vercel).
 ---
 
 **Desenvolvido por DhenSouza**
